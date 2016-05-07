@@ -1,0 +1,15 @@
+Something about distribution of goals vs league or qualifying games.
+This could be the minute they are scored in or just the number of goals.
+Use 1996-2012 only as all had 16 teams
+
+Requirements
+- all results from 1996-2012 (31*5=155 matches)
+- E0,SP1,D1,F1,I1 league results from 96,00,04,08,12 (have most already)
+- goal times for all euro matches? On wikipedia page.
+
+Plots
+- scatter of goals per game against game number in each champ, coloured by
+  year, with running average lines, overlaying the 5 champs
+- av goals per game for each year, along with values from major leagues in
+  the preceding season, maybe as grouped points with std dev error bars
+- overlaid freqpolys for goal time distribution?
