@@ -24,9 +24,9 @@ for (league in c('england/E0','germany/D1','france/F1','italy/I1','spain/SP1')) 
         
     }
 }
-#write.table(holdGoals,file='leagueGoals.csv',quote=FALSE,sep=",")
+#write.table(holdGoals,file='data/leagueGoals.csv',quote=FALSE,sep=",")
 
-euroGoals <- read.csv('euroGoals.csv',header=TRUE,sep=",")
+euroGoals <- read.csv('data/euroGoals.csv',header=TRUE,sep=",")
 euroGoals <- euroGoals[order(euroGoals$date),]
 euroGoals$year <- '1996'
 for (year in c(2000,2004,2008,2012)) {
