@@ -10,6 +10,7 @@ years = [1996,2000,2004,2008,2012]
 allDates = []
 totalGoals = []
 goalTimesGr, goalTimesKO = [], []
+injuryGoalsGr,injuryGoalsKO = [0,0,0,0], [0,0,0,0]
 
 for year in years:
 
@@ -42,7 +43,12 @@ for year in years:
                         for time in times:
                             if '+' in time:
                                 time = time.split('+')
-                                goalTimesGr.append(int(time[0])+int(time[1]))
+                                #NB reduce injury time goals to end of normal time
+                                goalTimesGr.append(int(time[0])) #+int(time[1]))
+                                if goalTimesGr[-1] == 45:
+                                    injuryGoalsGr[0] += 1
+                                elif goalTimesGr[-1] == 90:
+                                    injuryGoalsGr[1] += 1
                             else:
                                 goalTimesGr.append(int(time))
 
@@ -106,7 +112,16 @@ for year in years:
                     for time in times:
                         if '+' in time:
                             time = time.split('+')
-                            goalTimesKO.append(int(time[0])+int(time[1]))
+                            #NB reduce injury time goals to end of normal time
+                            goalTimesKO.append(int(time[0]))#+int(time[1]))
+                            if goalTimesKO[-1] == 45:
+                                injuryGoalsKO[0] += 1
+                            elif goalTimesKO[-1] == 90:
+                                injuryGoalsKO[1] += 1
+                            elif goalTimesKO[-1] == 105:
+                                injuryGoalsKO[2] += 1
+                            elif goalTimesKO[-1] == 120:
+                                injuryGoalsKO[3] += 1
                         else:
                             goalTimesKO.append(int(time))
 
@@ -129,6 +144,7 @@ for i in range(len(allDates)):
 #print totalGoals
 print len(allDates),len(totalGoals)
 print np.mean(totalGoals)
+print '%.2f%% games are 0-0' % ((np.mean([totalGoals[i] == 0 for i in range(len(totalGoals))]))*100)
 
 with open('euroGoals.csv','w') as csvfile:
     mywriter = csv.writer(csvfile)
@@ -139,10 +155,42 @@ with open('euroGoals.csv','w') as csvfile:
 goalTimes = goalTimesGr + goalTimesKO
 print len(goalTimes)
 
-plt.hist(goalTimesGr,bins=range(0,121,15),label='Group',weights=np.zeros_like(goalTimesGr)+1./len(goalTimesGr))
-plt.hist(goalTimesKO,bins=range(0,121,15),label='Knockout',rwidth=0.6,weights=np.zeros_like(goalTimesKO)+1./len(goalTimesKO))
+print np.sum([goalTimesGr[i] <= 45 for i in range(len(goalTimesGr))])*100./len(goalTimesGr),"% first half groups"
+print np.sum([45 < goalTimesGr[i] <= 90 for i in range(len(goalTimesGr))])*100./len(goalTimesGr),"% second half groups"
+KOgoals90mins = np.sum([goalTimesKO[i] <= 90 for i in range(len(goalTimesKO))])
+print np.sum([goalTimesKO[i] <= 45 for i in range(len(goalTimesKO))])*100./KOgoals90mins,"% first half KO"
+print np.sum([45 < goalTimesKO[i] <= 90 for i in range(len(goalTimesKO))])*100./KOgoals90mins,"% second half KO"
+
+nbinsGr,bins,patches = plt.hist(goalTimesGr,bins=np.arange(0.1,120.2,15),label='Group',weights=np.zeros_like(goalTimesGr)+1./len(goalTimesGr))
+nbinsKO,bins,patches = plt.hist(goalTimesKO,bins=np.arange(0.1,120.2,15),label='Knockout',rwidth=0.6,weights=np.zeros_like(goalTimesKO)+1./len(goalTimesKO))
 plt.xlabel('Time / minutes'); plt.ylabel('Fraction')
 plt.xticks(range(0,121,15))
-plt.legend()
+plt.legend(loc='upper left')
 plt.title('Euro 1996-2012 goal time distribution')
 plt.show()
+
+#TODO: combine nbins with injuryGoals and save for bar plot
+nbinsGr *= len(goalTimesGr)
+nbinsKO *= len(goalTimesKO)
+print nbinsGr,injuryGoalsGr
+print nbinsKO,injuryGoalsKO
+
+with open('data/goaltimes.csv','w') as csvfile:
+    mywriter = csv.writer(csvfile)
+    mywriter.writerow(['phase','startBin','endBin','regGoals','injGoals'])
+    for i in range(len(bins)-1):
+        if i not in [2,5,6,7]:
+            mywriter.writerow(['group',15*i,15*(i+1),int(nbinsGr[i]),0])
+            mywriter.writerow(['knockout',15*i,15*(i+1),int(nbinsKO[i]),0])
+        elif i == 2:
+            mywriter.writerow(['group',15*i,15*(i+1),int(nbinsGr[i])-injuryGoalsGr[0],injuryGoalsGr[0]])
+            mywriter.writerow(['knockout',15*i,15*(i+1),int(nbinsKO[i])-injuryGoalsKO[0],injuryGoalsKO[0]])
+        elif i == 5:
+            mywriter.writerow(['group',15*i,15*(i+1),int(nbinsGr[i])-injuryGoalsGr[1],injuryGoalsGr[1]])
+            mywriter.writerow(['knockout',15*i,15*(i+1),int(nbinsKO[i])-injuryGoalsKO[1],injuryGoalsKO[1]])
+        elif i == 6:
+            mywriter.writerow(['group',15*i,15*(i+1),int(nbinsGr[i])-injuryGoalsGr[2],injuryGoalsGr[2]])
+            mywriter.writerow(['knockout',15*i,15*(i+1),int(nbinsKO[i])-injuryGoalsKO[2],injuryGoalsKO[2]])
+        elif i == 7:
+            mywriter.writerow(['group',15*i,15*(i+1),int(nbinsGr[i])-injuryGoalsGr[3],injuryGoalsGr[3]])
+            mywriter.writerow(['knockout',15*i,15*(i+1),int(nbinsKO[i])-injuryGoalsKO[3],injuryGoalsKO[3]])

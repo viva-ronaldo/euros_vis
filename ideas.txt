@@ -18,6 +18,8 @@ Plots
       in 08, middle in 00. Germany most goals all years, France
       least 4/5 times.
 - overlaid freqpolys for goal time distribution? *Dimple steps horiz stacked*
+    or *vert stacked group bar* to include injury time part
   - More goals in second half; particularly few in first 15 mines in KOs.
+  - leagues all show ~44% goals first half. Groups 39%, knockouts 38%.
 
 Can't find game stats for older champs.

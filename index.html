@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+
+<html lang="en-US">
+<meta charset="utf-8">
+
+<head>
+  <h1>European Championships</h1>
+<script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<script src="http://dimplejs.org/dist/dimple.v2.2.0.min.js"></script>
+<!--<script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+<script type="text/javascript" src="https://d3.js.org/d3.layout.js"></script>
+-->
+</head>
+
+<body>
+
+<p>In anticipation of the upcoming Euro 2016 tournament, I'm looking a little at results from the past five tournaments. Scores and goal times from all 155 matches were obtained from Wikipedia, and compared with match scores from major European leagues obtained from <a href="http://www.football-data.co.uk/data.php">football-data.co.uk</a>.</p>
+
+<p>Do international championship matches tend to be tight affairs with fewer goals than club league games? The plot below compares the average number of goals per game in both the group and knockout phases of each tournament with the same quantity from the preceding seasons of top-flight football from the five strongest European leagues. Consistently over the five seasons, there were most goals in the Bundesliga, followed by the English and Spanish top divisions. The Euros group stages have generally produced goals at a similar rate to the lowest-scoring European league, France. The knockout stages have seen significantly fewer goals, though with only 7 matches in each year the annual averages are noisy and range from 1.1 to 2.6 goals per game.
+
+  In the knockout stages, 8 out of 35 matches, or 23%, have finished 0-0 after 90 minutes, compared to around 6-9% in four of the leagues, and 11% in Ligue 1.
+
+  **mention 90 min limit.
+
+<div id="svg1" style="width:900px; height:250px"></div>
+
+<p>Goal timings: slightly more in second half relative to leagues; very few in first 15 mins in knockouts; 3x as many in second half extra time as first though numbers are small;</p>
+
+<div id="svg2" style="width:900px; height:250px"></div>
+
+<script type="text/javascript">
+
+var svg1 = dimple.newSvg("#svg1","100%","100%");
+
+d3.csv("data/leagueGoals.csv", function (data) {
+  var myChart = new dimple.chart(svg1, data);
+  myChart.setBounds("10%","8%","45%","70%");
+
+  var x = myChart.addCategoryAxis("x", ["year","league"]);
+  x.addGroupOrderRule(["Germany","England","Spain","Italy","France","Euros groups","Euros knockouts"]);
+  var y1 = myChart.addMeasureAxis("y", "mean");
+  var s = myChart.addSeries("league", dimple.plot.bar); //, [x,y1]);
+  
+
+  s.getTooltipText = function (e) {
+    if (e.aggField[0] === 'Euros_KO' || e.aggField[0] === 'Euros_group') {
+      yearText = e.xField[0];
+    } else {
+      if (e.xField[0] == 2000) {
+        yearText = '1999/00';
+      } else {
+        yearText = (+e.xField[0]-1)+"/"+String(+e.xField[0]).substring(2,4);
+      }
+    }
+    return [e.aggField[0]+", "+yearText+",",
+              +e.y.toFixed(1)+" goals per game"];
+  }; 
+
+  x.title = "";
+  y1.title = "Avg goals per game";
+  var myLegend = myChart.addLegend("60%","10%","15%","60%","left");
+  myLegend._getEntries = function () {
+    var orderedValues = ["Germany","England","Spain","Italy","France","Euros groups","Euros knockouts"];
+    var entries = [];
+    orderedValues.forEach(function (v) {
+      entries.push({
+          key: v,
+          fill: myChart.getColor(v).fill,
+          stroke: myChart.getColor(v).stroke,
+          opacity: myChart.getColor(v).opacity,
+          series: s,
+          aggField: [v]
+      });
+    }, this);
+    return entries;
+  };
+
+
+  myChart.draw();
+ 
+});
+
+
+
+</script>
+
+</body>
+
+</html>
