@@ -161,6 +161,9 @@ KOgoals90mins = np.sum([goalTimesKO[i] <= 90 for i in range(len(goalTimesKO))])
 print np.sum([goalTimesKO[i] <= 45 for i in range(len(goalTimesKO))])*100./KOgoals90mins,"% first half KO"
 print np.sum([45 < goalTimesKO[i] <= 90 for i in range(len(goalTimesKO))])*100./KOgoals90mins,"% second half KO"
 
+#Extra time: 96 final stopped at 95, 2000 semi 1 at 117, final at 103, 
+#  2004 semi 2 at 105+1 
+
 nbinsGr,bins,patches = plt.hist(goalTimesGr,bins=np.arange(0.1,120.2,15),label='Group',weights=np.zeros_like(goalTimesGr)+1./len(goalTimesGr))
 nbinsKO,bins,patches = plt.hist(goalTimesKO,bins=np.arange(0.1,120.2,15),label='Knockout',rwidth=0.6,weights=np.zeros_like(goalTimesKO)+1./len(goalTimesKO))
 plt.xlabel('Time / minutes'); plt.ylabel('Fraction')
@@ -169,28 +172,40 @@ plt.legend(loc='upper left')
 plt.title('Euro 1996-2012 goal time distribution')
 plt.show()
 
-#TODO: combine nbins with injuryGoals and save for bar plot
-nbinsGr *= len(goalTimesGr)
-nbinsKO *= len(goalTimesKO)
+
+#nbinsGr *= len(goalTimesGr)
+#nbinsKO *= len(goalTimesKO)
+injuryGoalsGr = np.asarray(injuryGoalsGr) / float(len(goalTimesGr))
+injuryGoalsKO = np.asarray(injuryGoalsKO) / float(len(goalTimesKO))
 print nbinsGr,injuryGoalsGr
 print nbinsKO,injuryGoalsKO
 
 with open('data/goaltimes.csv','w') as csvfile:
     mywriter = csv.writer(csvfile)
-    mywriter.writerow(['phase','startBin','endBin','regGoals','injGoals'])
+    mywriter.writerow(['phase','binTimes','goals','goalCategory'])
     for i in range(len(bins)-1):
-        if i not in [2,5,6,7]:
-            mywriter.writerow(['group',15*i,15*(i+1),int(nbinsGr[i]),0])
-            mywriter.writerow(['knockout',15*i,15*(i+1),int(nbinsKO[i]),0])
+        if i in [0,1,3,4,7]:
+            mywriter.writerow(['Groups',str(15*i+1)+'-'+str(15*(i+1)),100*float(nbinsGr[i]),'reg'])
+            mywriter.writerow(['Groups',str(15*i+1)+'-'+str(15*(i+1)),0,'inj'])
+            mywriter.writerow(['Knockouts',str(15*i+1)+'-'+str(15*(i+1)),100*float(nbinsKO[i]),'reg'])
+            mywriter.writerow(['Knockouts',str(15*i+1)+'-'+str(15*(i+1)),0,'inj'])
         elif i == 2:
-            mywriter.writerow(['group',15*i,15*(i+1),int(nbinsGr[i])-injuryGoalsGr[0],injuryGoalsGr[0]])
-            mywriter.writerow(['knockout',15*i,15*(i+1),int(nbinsKO[i])-injuryGoalsKO[0],injuryGoalsKO[0]])
+            mywriter.writerow(['Groups',str(15*i+1)+'-'+str(15*(i+1)),100*float(nbinsGr[i])-injuryGoalsGr[0],'reg'])
+            mywriter.writerow(['Groups',str(15*i+1)+'-'+str(15*(i+1)),100*injuryGoalsGr[0],'inj'])
+            mywriter.writerow(['Knockouts',str(15*i+1)+'-'+str(15*(i+1)),100*float(nbinsKO[i])-injuryGoalsKO[0],'reg'])
+            mywriter.writerow(['Knockouts',str(15*i+1)+'-'+str(15*(i+1)),100*injuryGoalsKO[0],'inj'])
         elif i == 5:
-            mywriter.writerow(['group',15*i,15*(i+1),int(nbinsGr[i])-injuryGoalsGr[1],injuryGoalsGr[1]])
-            mywriter.writerow(['knockout',15*i,15*(i+1),int(nbinsKO[i])-injuryGoalsKO[1],injuryGoalsKO[1]])
+            mywriter.writerow(['Groups',str(15*i+1)+'-'+str(15*(i+1)),100*float(nbinsGr[i])-injuryGoalsGr[1],'reg'])
+            mywriter.writerow(['Groups',str(15*i+1)+'-'+str(15*(i+1)),100*injuryGoalsGr[1],'inj'])
+            mywriter.writerow(['Knockouts',str(15*i+1)+'-'+str(15*(i+1)),100*float(nbinsKO[i])-injuryGoalsKO[1],'reg'])
+            mywriter.writerow(['Knockouts',str(15*i+1)+'-'+str(15*(i+1)),100*injuryGoalsKO[1],'inj'])
         elif i == 6:
-            mywriter.writerow(['group',15*i,15*(i+1),int(nbinsGr[i])-injuryGoalsGr[2],injuryGoalsGr[2]])
-            mywriter.writerow(['knockout',15*i,15*(i+1),int(nbinsKO[i])-injuryGoalsKO[2],injuryGoalsKO[2]])
+            mywriter.writerow(['Groups',str(15*i+1)+'-'+str(15*(i+1)),100*float(nbinsGr[i])-injuryGoalsGr[2],'reg'])
+            mywriter.writerow(['Groups',str(15*i+1)+'-'+str(15*(i+1)),100*injuryGoalsGr[2],'inj'])
+            mywriter.writerow(['Knockouts',str(15*i+1)+'-'+str(15*(i+1)),100*float(nbinsKO[i])-injuryGoalsKO[2],'reg'])
+            mywriter.writerow(['Knockouts',str(15*i+1)+'-'+str(15*(i+1)),100*injuryGoalsKO[2],'inj'])
         elif i == 7:
-            mywriter.writerow(['group',15*i,15*(i+1),int(nbinsGr[i])-injuryGoalsGr[3],injuryGoalsGr[3]])
-            mywriter.writerow(['knockout',15*i,15*(i+1),int(nbinsKO[i])-injuryGoalsKO[3],injuryGoalsKO[3]])
+            mywriter.writerow(['Groups',str(15*i+1)+'-'+str(15*(i+1)),100*float(nbinsGr[i])-injuryGoalsGr[3],'reg'])
+            mywriter.writerow(['Groups',str(15*i+1)+'-'+str(15*(i+1)),100*injuryGoalsGr[3],'inj'])
+            mywriter.writerow(['Knockouts',str(15*i+1)+'-'+str(15*(i+1)),100*float(nbinsKO[i])-injuryGoalsKO[3],'reg'])
+            mywriter.writerow(['Knockouts',str(15*i+1)+'-'+str(15*(i+1)),100*injuryGoalsKO[3],'inj'])

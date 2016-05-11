@@ -8,16 +8,14 @@ DONE E0,SP1,D1,F1,I1 league results from 96,00,04,08,12 (have most already)
 DONE goal times for all euro matches? On wikipedia pages.
 
 Plots
-- scatter of goals per game against game number in each champ, coloured by
-  year, with running average lines, overlaying the 5 champs
-  - means are 2.51 group stages, 1.94 knockouts
-- av goals per game for each year, along with values from major leagues in
+DONE av goals per game for each year, along with values from major leagues in
   the preceding season, maybe as grouped points with std dev error bars
   *Dimple bars vertical grouped*
   - this shows Euros below all leagues in 96,04,12, joint last with France
       in 08, middle in 00. Germany most goals all years, France
       least 4/5 times.
-- overlaid freqpolys for goal time distribution? *Dimple steps horiz stacked*
+  - means are 2.51 group stages, 1.94 knockouts
+DONE overlaid freqpolys for goal time distribution? *Dimple steps horiz stacked*
     or *vert stacked group bar* to include injury time part
   - More goals in second half; particularly few in first 15 mines in KOs.
   - leagues all show ~44% goals first half. Groups 39%, knockouts 38%.

@@ -16,17 +16,16 @@
 
 <p>In anticipation of the upcoming Euro 2016 tournament, I'm looking a little at results from the past five tournaments. Scores and goal times from all 155 matches were obtained from Wikipedia, and compared with match scores from major European leagues obtained from <a href="http://www.football-data.co.uk/data.php">football-data.co.uk</a>.</p>
 
-<p>Do international championship matches tend to be tight affairs with fewer goals than club league games? The plot below compares the average number of goals per game in both the group and knockout phases of each tournament with the same quantity from the preceding seasons of top-flight football from the five strongest European leagues. Consistently over the five seasons, there were most goals in the Bundesliga, followed by the English and Spanish top divisions. The Euros group stages have generally produced goals at a similar rate to the lowest-scoring European league, France. The knockout stages have seen significantly fewer goals, though with only 7 matches in each year the annual averages are noisy and range from 1.1 to 2.6 goals per game.
+<p>Do international championship matches tend to be tight affairs with fewer goals than club league games? The plot below compares the average number of goals per game in both the group and knockout (excluding extra time) phases of each tournament with the same quantity from the preceding seasons of top-flight football from the five strongest European leagues. Consistently over the five seasons, there were most goals in the Bundesliga, followed by the English and Spanish top divisions. The Euros group stages have generally produced goals at a similar rate to the lowest-scoring European league, France. The knockout stages have seen significantly fewer goals, though with only 7 matches in each year the annual averages are noisy and range from 1.1 to 2.6 goals per game. In the knockout stages, 8 out of 35 matches, or 23%, have finished 0-0 after 90 minutes, compared to around 6-9% in four of the leagues, and 11% in Ligue 1.</p>
 
-  In the knockout stages, 8 out of 35 matches, or 23%, have finished 0-0 after 90 minutes, compared to around 6-9% in four of the leagues, and 11% in Ligue 1.
+<p>So, goals are in the group phase only slightly less common (2.5 per game) than in club football, but do become more scarce at the knockout stage (1.9 per game, in 90 minutes).</p>
 
-  **mention 90 min limit.
+<div id="svg1" style="width:1200px; height:250px"></div>
 
-<div id="svg1" style="width:900px; height:250px"></div>
-
-<p>Goal timings: slightly more in second half relative to leagues; very few in first 15 mins in knockouts; 3x as many in second half extra time as first though numbers are small;</p>
+<p>The distribution of goal times is shown below, separately for group and knockout games. In both phases there are more second half than first half goals (61-62% second half), which is a bigger imbalance to that seen in the major European leagues (~56% second half). During normal time, goals are least common in the first 15 minutes, particularly in knockout games, where cagey openings seem to be the norm. Discounting second half injury time, the most likely time for a goal to be scored is at the beginning of the second half, but with injury time included, from 76 minutes to full-time is the most popular bracket. In extra time, goals may be much more common in the second half than the first half, though the sample size is small here (8 goals).</p>
 
 <div id="svg2" style="width:900px; height:250px"></div>
+
 
 <script type="text/javascript">
 
@@ -80,7 +79,43 @@ d3.csv("data/leagueGoals.csv", function (data) {
  
 });
 
+var svg2 = dimple.newSvg("#svg2","100%","100%");
 
+d3.csv("data/goaltimes.csv", function (data) {
+  var myChart = new dimple.chart(svg2, data);
+  myChart.setBounds("10%","8%","45%","70%");
+
+  var x = myChart.addCategoryAxis("x", ["binTimes","phase"]);
+  var y1 = myChart.addMeasureAxis("y", "goals");
+  var s = myChart.addSeries(["goalCategory","phase"], dimple.plot.bar); //, [x,y1]);
+  x.addOrderRule(["1-15","16-30","31-45","46-60","61-75","76-90","91-105","106-120"]);
+  //c1.colors = ["#DA9694", "#FABF8F", "#C4D79B"];
+  myChart.assignColor("phase", "#222222", "#000000", 0.1);
+
+  x.title = "Minutes";
+  y1.title = "Percentage of goals";
+  var myLegend = myChart.addLegend("50%","10%","15%","60%","left");
+
+  s.getTooltipText = function (e) {
+    if (e.aggField[0] === 'reg') {
+      whichTime = e.xField[0]+' mins,';
+    } else {
+      if (e.xField[0] === '31-45') {
+        whichTime = 'First half injury time,';
+      } else if (e.xField[0] === '76-90') {
+        whichTime = 'Second half injury time,';
+      } else if (e.xField[0] === '106-120') {
+        whichTime = 'Second half extra time injury time,';
+      } else {
+        whichTime = '';
+      }
+    };
+    return [whichTime,e.xField[1].toLowerCase()+": "+(e.yValue).toFixed(1)+"% goals"];
+  };
+
+  myChart.draw();
+
+});
 
 </script>
 
